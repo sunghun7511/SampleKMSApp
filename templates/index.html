@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sample KMS APP</title>
+    </head>
+    <body>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" />
+            <input type="submit"/>
+        </form>
+        <form id="download_form">
+            <input id="filename" type="text" />
+            <input type="submit"/>
+        </form>
+    </body>
+    <script>
+        document.getElementById("download_form").onsubmit =function() {
+            filename = document.getElementById("filename").value
+            location.href = "/download/" + filename;                    
+            return false;
+        };
+    </script>
+</html>
