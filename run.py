@@ -5,8 +5,7 @@ from uuid import uuid4
 from boto3 import resource
 from flask import Flask, render_template, request, send_file
 
-from encryption import encrypt_aes, decrypt_aes
-from kms import generate_key, decrypt_key
+from kms import encrypt, decrypt
 
 parser = ArgumentParser("Sample KMS APP")
 parser.add_argument("-c", "--cmk", type=str, required=True, help="Key ID")
@@ -31,18 +30,18 @@ def main():
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    if "file" not in request.files:
+        return alert("'File' not found")
+
     file_obj = request.files['file']
     bytes = file_obj.stream.read()
 
-    encrypted_key, key = generate_key(args.cmk)
-    data = encrypt_aes(key, bytes)
-
+    # encrypt with KMS and upload to S3
+    data = encrypt(args.cmk, bytes)
     filename = str(uuid4()).replace("-", "")
-    data = len(encrypted_key).to_bytes(2, "little") + encrypted_key + data
     s3.Object(args.bucket, filename).put(Body=data)
 
     filenames[filename] = file_obj.filename
-
     return alert(f"Uploaded : {filename}")
 
 
@@ -52,10 +51,9 @@ def download(filename):
         return alert("File not found.")
     real_filename = filenames.pop(filename)
 
+    # download from S3 and decrypt with KMS
     encrypted_data = s3.Object(args.bucket, filename).get()["Body"].read()
-    key_size = int.from_bytes(encrypted_data[:2], "little")
-    key = decrypt_key(encrypted_data[2:2+key_size])
-    data = decrypt_aes(key, encrypted_data[2+key_size:])
+    data = decrypt(encrypted_data)
 
     return send_file(
         BytesIO(data),
