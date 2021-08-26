@@ -5,11 +5,17 @@ from uuid import uuid4
 from boto3 import resource
 from flask import Flask, render_template, request, send_file
 
-from kms import encrypt, decrypt
+from kms import decrypt, encrypt
 
 parser = ArgumentParser("Sample KMS APP")
 parser.add_argument("-c", "--cmk", type=str, required=True, help="Key ID")
-parser.add_argument("-b", "--bucket", type=str, default="sunghun-sandbox-sample-kms-bucket", help="Name of bucket")
+parser.add_argument(
+    "-b",
+    "--bucket",
+    type=str,
+    default="sunghun-sandbox-sample-kms-bucket",
+    help="Name of bucket",
+)
 args = parser.parse_args()
 
 s3 = resource("s3")
@@ -20,7 +26,7 @@ app = Flask(__name__)
 
 
 def alert(message):
-    return f"<script>alert(\"{message}\");history.back();</script>"
+    return f'<script>alert("{message}");history.back();</script>'
 
 
 @app.route("/")
@@ -33,7 +39,7 @@ def upload():
     if "file" not in request.files:
         return alert("'File' not found")
 
-    file_obj = request.files['file']
+    file_obj = request.files["file"]
     bytes = file_obj.stream.read()
 
     # encrypt with KMS and upload to S3
@@ -57,9 +63,9 @@ def download(filename):
 
     return send_file(
         BytesIO(data),
-        mimetype='text/csv',
+        mimetype="text/csv",
         download_name=real_filename,
-        as_attachment=True
+        as_attachment=True,
     )
 
 
