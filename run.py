@@ -58,7 +58,7 @@ def download(filename):
     return send_file(
         BytesIO(data),
         mimetype='text/csv',
-        attachment_filename=real_filename,
+        download_name=real_filename,
         as_attachment=True
     )
 
