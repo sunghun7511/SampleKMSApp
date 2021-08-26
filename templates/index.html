@@ -14,7 +14,7 @@
         </form>
     </body>
     <script>
-        document.getElementById("download_form").onsubmit =function() {
+        document.getElementById("download_form").onsubmit = function() {
             filename = document.getElementById("filename").value
             location.href = "/download/" + filename;                    
             return false;
