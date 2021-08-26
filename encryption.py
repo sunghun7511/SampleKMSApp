@@ -25,4 +25,4 @@ def decrypt_aes(key, data):
     enc = b64decode(data)
     iv = enc[:AES.block_size]
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    return _unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
+    return _unpad(cipher.decrypt(enc[AES.block_size:]))
